@@ -1,0 +1,50 @@
+Sub AsignarIDPalabras()
+    Dim columnaOriginal As Range
+    Dim columnaID As Range
+    Dim celda As Range
+    Dim palabrasUnicas As Collection
+    Dim palabra As Variant
+    Dim contador As Long
+    
+    ' Especifica la columna original con los materiales
+    Set columnaOriginal = Range("A:A") ' Cambia "A:A" por la columna deseada
+    
+    ' Define la columna para guardar los ID correlativamente
+    Set columnaID = Range("B:B") ' Cambia "B:B" por la columna deseada
+    
+    ' Inicializa una colección para almacenar las palabras únicas y sus ID
+    Set palabrasUnicas = New Collection
+    
+    ' Recorre todas las celdas de la columna original
+    For Each celda In columnaOriginal
+        ' Obtiene el valor de la celda
+        palabra = celda.Value
+        
+        ' Verifica si la celda no está vacía y la palabra no está en la colección
+        If Not IsEmpty(palabra) And Not Contiene(palabrasUnicas, CStr(palabra)) Then
+            palabrasUnicas.Add palabrasUnicas.Count + 1, CStr(palabra)
+        End If
+    Next celda
+    
+    ' Asigna los ID correlativamente a cada palabra
+    For Each celda In columnaOriginal
+        ' Obtiene el valor de la celda
+        palabra = celda.Value
+        
+        ' Verifica si la celda no está vacía
+        If Not IsEmpty(palabra) Then
+            ' Busca el ID correspondiente a la palabra en la colección
+            columnaID.Cells(celda.Row, 1).Value = palabrasUnicas(CStr(palabra))
+        End If
+    Next celda
+End Sub
+
+Function Contiene(ByVal col As Collection, ByVal valor As Variant) As Boolean
+    Dim elem As Variant
+    
+    On Error Resume Next
+    elem = col(valor)
+    On Error GoTo 0
+    
+    Contiene = Not IsEmpty(elem)
+End Function
