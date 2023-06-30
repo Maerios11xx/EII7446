@@ -1,0 +1,81 @@
+#Notar que hay más paquetes y librerias de las que se ocuparon, no se ocuparon las lineas con JAVA.
+#Cargar paquetes
+install.packages("FSelector")
+install.packages("rpart")
+install.packages("caret",dependencies = TRUE)
+install.packages("dplyr")
+install.packages("rpart.plot")
+install.packages("xlsx")
+install.packages("openxlsx")
+install.packages("data.tree")
+install.packages("caTools")
+install.packages("MASS")
+install.packages("ISLR")
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("psych")
+install.packages("tree")
+install.packages("ggpubr")
+install.packages("readxl")
+Sys.setenv(JAVA_HOME="C:/Program Files/Java/jdk-20")
+Sys.getenv('JAVA_HOME')
+
+
+#Cargar librerias
+library(readxl)
+library(FSelector)
+library(rpart)
+library(caret)
+library(rpart.plot)
+library(dplyr)
+library(xlsx)
+library(data.tree)
+library(caTools)
+library(MASS)
+library(ISLR)
+library(ggplot2)
+library(tidyr)
+library(psych)
+library(tree)
+library(ggpubr)
+library(openxlsx)
+
+
+
+#Cargar base de datos
+setwd("C:/Users/Equipo/Desktop/Arte")
+ruta_archivo<-"C:/Users/Equipo/Desktop/Arte/BD_ArteOF2.xlsx"
+nombre_hoja<-"BD_Arte"
+df<-read.xlsx(ruta_archivo,sheet= nombre_hoja)
+
+#Selección de columnas para la clasificación
+columnas_seleccionadas<-c("pintura","Largo","Ancho","Profundidad","MaterialID","TecnicaID")
+#columnas_seleccionadas<-c("pintura","Largo","Ancho","Profundidad")
+dfselect<-df[,columnas_seleccionadas]
+dfselect<-mutate(dfselect, pintura=factor(pintura), Largo=as.numeric(Largo), Ancho=as.numeric(Ancho), Profundidad=as.numeric(Profundidad), MaterialID=factor(MaterialID), TecnicaID=factor(TecnicaID))
+
+#División conjunto de entrenamiento y de testeo
+set.seed(123)
+sample=sample.split(dfselect$pintura,SplitRatio = .60)
+train=subset(dfselect,sample==TRUE)
+test=subset(dfselect,sample==FALSE)
+
+#Entrenamiento del arbol de clasificación
+tree<-rpart(pintura~.,data=train)
+
+#Clasificacion
+tree.pintura.predicted<- predict(tree,test,type="class")
+
+#Matriz de confusión para evaluar el modelo
+confusionMatrix(tree.pintura.predicted, test$pintura)
+
+#Visualización del arbol
+prp(tree)
+summary(tree)
+summary(tree.pintura.predicted)
+
+#Grafica matriz de confusión
+confusion<-confusionMatrix(tree.pintura.predicted, test$pintura)
+plot(confusion$table, col= c("lightblue", "lightgreen"), 
+     main = "Matriz de Confusión", 
+     xlab = "Predicted", ylab = "Actual")
