@@ -1,0 +1,21 @@
+'Macro para ordenar la base de datos generada desde los archivos XML, borra palabras innecesarias
+Sub BorrarPalabra()
+    Dim palabraABorrar As String
+    Dim columna As Range
+    Dim celda As Range
+    
+    ' Especifica la palabra que deseas borrar
+    palabraABorrar = "palabra"
+    
+    ' Especifica la columna en la que deseas borrar la palabra
+    Set columna = Range("A:A") ' Cambia "A:A" por la columna deseada
+    
+    ' Recorre todas las celdas de la columna
+    For Each celda In columna
+        ' Verifica si la celda contiene la palabra a borrar
+        If InStr(1, celda.Value, palabraABorrar, vbTextCompare) > 0 Then
+            ' Reemplaza la palabra con una cadena vacía
+            celda.Value = Replace(celda.Value, palabraABorrar, "", , , vbTextCompare)
+        End If
+    Next celda
+End Sub
