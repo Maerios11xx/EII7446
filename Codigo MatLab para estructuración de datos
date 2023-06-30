@@ -1,0 +1,46 @@
+folder_path = 'C:/Users/Equipo/Desktop/basesmat/rijksxml/xml2/';
+file_list = dir(fullfile(folder_path, '*.xml'));
+
+all_nodes = {};  % Celda para almacenar todos los nodos encontrados
+
+for i = 1:numel(file_list)
+    file_path = fullfile(folder_path, file_list(i).name);
+    xml_data = xmlread(file_path);
+    objects = xml_data.getElementsByTagName('oai_dc:dc');
+    
+    for j = 0:objects.getLength()-1
+        object = objects.item(j);
+        subnodes = object.getChildNodes();
+        
+        for k = 0:subnodes.getLength()-1
+            subnode = subnodes.item(k);
+            
+            if subnode.getNodeType() == subnode.ELEMENT_NODE
+                node_value = char(subnode.getTextContent());
+                
+                if isempty(all_nodes) || k+1 > size(all_nodes, 2)
+                    all_nodes{j+1, k+1} = {node_value};
+                else
+                    all_nodes{j+1, k+1} = [all_nodes{j+1, k+1}; {node_value}];
+                end
+            end
+        end
+    end
+end
+
+% Crear una matriz de celdas con datos faltantes
+max_rows = max(cellfun(@(x) size(x, 1), all_nodes));
+object_info_mat = cell(max_rows, size(all_nodes, 2));
+
+for i = 1:size(all_nodes, 2)
+    for j = 1:size(all_nodes, 1)
+        if ~isempty(all_nodes{j, i})
+            object_info_mat(1:numel(all_nodes{j, i}), i) = all_nodes{j, i};
+        end
+    end
+end
+
+% Convertir la matriz de celdas en una tabla y guardar en un archivo Excel
+table_data = cell2table(object_info_mat);
+excel_file = 'BD_Arte_version2.xlsx';
+writetable(table_data, excel_file, 'Sheet', 1, 'WriteVariableNames', false);
