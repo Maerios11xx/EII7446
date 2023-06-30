@@ -1,0 +1,37 @@
+'Macro utilizada para conservar los números que venían unidos a letras, por ejemplo, todas las dimensiones venían unidas a unidades de medidas desorndenadas 16Cmmmmmm, se utilizó la macro para dejar solo los números de las dimensiones 
+Sub ConservarNumeros()
+    Dim columna As Range
+    Dim celda As Range
+    Dim valorOriginal As String
+    Dim valorNumerico As String
+    Dim caracter As String
+    Dim esNumero As Boolean
+    
+    ' Especifica la columna en la que deseas conservar los números
+    Set columna = Range("A:A") ' Cambia "A:A" por la columna deseada
+    
+    ' Recorre todas las celdas de la columna
+    For Each celda In columna
+        ' Obtiene el valor original de la celda
+        valorOriginal = celda.Value
+        
+        ' Inicializa la variable para almacenar el valor numérico
+        valorNumerico = ""
+        
+        ' Recorre cada carácter del valor original
+        For i = 1 To Len(valorOriginal)
+            ' Obtiene el carácter actual
+            caracter = Mid(valorOriginal, i, 1)
+            
+            ' Verifica si el carácter es numérico o un punto o una coma
+            esNumero = IsNumeric(caracter)
+            If esNumero Or caracter = "." Or caracter = "," Then
+                ' Concatena el carácter al valor numérico
+                valorNumerico = valorNumerico & caracter
+            End If
+        Next i
+        
+        ' Asigna el valor numérico a la celda
+        celda.Value = valorNumerico
+    Next celda
+End Sub
